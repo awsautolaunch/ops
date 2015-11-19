@@ -152,6 +152,14 @@ bash "config_manager_first_time" do
     not_if { ::File.exists?('/var/www/html/Jobs') }
 end
 
+cookbook_file "/etc/php.ini" do
+    source "php.ini"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, 'service[php-fpm]', :immediately
+end
+
 # Set file perms
 execute "release_folder_perms" do
     command 'chown -R nginx.nginx /var/www/html/releases/'
