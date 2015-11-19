@@ -144,12 +144,12 @@ end
 
 bash "config_manager_first_time" do
     code <<-EOH
-        mkdir -p /var/www/html/configs /var/www/html/Jobs
-        echo '{"job_name":"db_node"}' > /var/www/html/Jobs/first_db_job
-        echo '{"job_name":"redis_node"}' > /var/www/html/Jobs/first_redis_job
-        chown nginx.nginx -R /var/www/html/configs /var/www/html/Jobs
+        mkdir -p /var/www/html/configs /var/www/html/jobs
+        echo '{"job_name":"db_node"}' > /var/www/html/jobs/first_db_job
+        echo '{"job_name":"redis_node"}' > /var/www/html/jobs/first_redis_job
+        chown nginx.nginx -R /var/www/html/configs /var/www/html/jobs
     EOH
-    not_if { ::File.exists?('/var/www/html/Jobs') }
+    not_if { ::File.exists?('/var/www/html/jobs') }
 end
 
 cookbook_file "/etc/php.ini" do
