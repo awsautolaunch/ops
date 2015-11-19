@@ -1,0 +1,8 @@
+name 'redis_node'
+maintainer 'The Authors'
+maintainer_email 'you@example.com'
+license 'all_rights'
+description 'Installs/Configures redis_node'
+long_description 'Installs/Configures redis_node'
+version '0.1.0'
+depends 'base'

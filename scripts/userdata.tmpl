@@ -1,0 +1,5 @@
+#!/bin/bash
+
+aws s3 cp s3://tt-assignment/ops/chef/scripts/bootstrap.sh /tmp/bootstrap.sh
+bash /tmp/bootstrap.sh CHEF_ROLE_PLACE_HOLDER
+bash /opt/ops/chef/tag.sh bootcompleted true
