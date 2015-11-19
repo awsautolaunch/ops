@@ -67,7 +67,6 @@ Class RedisJob{
         $destination = '/var/www/html/configs/redis.ips';     
         file_put_contents($source, json_encode($redis_ips));
         foreach($web_ips as $ip) {
-            $ip = '52.32.61.254';
             exec("scp $source $ip:$destination");
         }
         unlink($source);

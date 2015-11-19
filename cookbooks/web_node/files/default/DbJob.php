@@ -143,14 +143,12 @@ Class DbJob{
         $db_ips = $this->ec2->getInstanceIPs($instanceIds);
         $web_nodes = $this->getWorkingNodes('cloudinit','web_node');
         $web_ips = $this->ec2->getInstanceIPs($web_nodes);
-        $db_ips = array('52.32.225.70', '52.25.148.144');
         $conf_content = $this->getConfigurationFile($db_ips);
         $source = tempnam ('/tmp', 'pgpool');
         $destination = '/etc/pgpool-II/pgpool.conf';
         file_put_contents($source, $conf_content);
 
         foreach($web_ips as $ip) {
-            $ip = '52.32.61.254';
             $output = array();
             exec("scp $source $ip:$destination", $output);
             print_r($output);
