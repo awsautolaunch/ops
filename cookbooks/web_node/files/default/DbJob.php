@@ -26,8 +26,10 @@ Class DbJob{
         }
 
         $working_nodes = $this->getWorkingNodes('cloudinit');
-        $this->pushConfig($working_nodes);
-        unlink($job_file);
+        if (count($working_nodes) > 0 ) { 
+            $this->pushConfig($working_nodes);
+            unlink($job_file);
+        }
     }
 
     private function getWorkingNodes($tag_name, $role_name="db_node") {
@@ -61,22 +63,26 @@ Class DbJob{
     private function getPcpCount() {
         $command = 'pcp_node_count 10 localhost 9898 postgres wordpass1';
         $output = array();
-        exec($command, $output);
-        return $output[0];
-
+        $var;
+        exec($command, $output,$var);
+	return intval($output[0]);
     }
 
+    private function logIt($message) {
+        print_r($message);
+        print_r("\n");
+    }
     private function getMapping($db_ips) {
         $mapping = array();
         $count = $this->getPcpCount();
         $master = $this->findMaster($db_ips);
+
 
         if (is_array($master) && count($master) > 1) {
             $this->exitWithError("Multiple Masters found, manual intervention needed.");
         }   
 
         if ($count === 0)  {
-            $master = findMaster($db_ips);
             if ($master == false) {
                 $mapping['master'] = $db_ips[0];
                 unset($db_ips[0]);
@@ -86,8 +92,10 @@ Class DbJob{
                 $mapping['slave'] = array_diff($db_ips, $master);
             }   
 
+
             $this->setupReplication($mapping['master'], $mapping['slave']);
             $mapping = $this->convertToMappingArray($mapping);
+
         } else {
             if ($count !== count($db_ips)) {
                 $node_id_mapping = array();
@@ -95,14 +103,20 @@ Class DbJob{
                 for ($i=0; $i<$count ; $i++) {
                     $node_id_mapping[$i] = $this->getPcpNodeIp($i);
                 }   
+
                 $unaccounted_servers = array_diff($db_ips, $node_id_mapping);
                 $unused_node_ids = array_keys(array_diff_key($db_ips, $node_id_mapping));
+
+
                 $this->setupReplication($mapping['master'], $unaccounted_servers);
                 $this->assignNodeIds($unused_node_ids, $unaccounted_servers, $node_id_mapping);
                 $mapping = $node_id_mapping;
+
                     
             } else {
-                $this->exitWithError("Config is good.");
+                for ($i=0; $i<$count ; $i++) {
+                    $mapping[$i] = $this->getPcpNodeIp($i);
+                }
             }   
         }   
         return $mapping;
@@ -151,9 +165,7 @@ Class DbJob{
         foreach($web_ips as $ip) {
             $output = array();
             exec("scp $source $ip:$destination", $output);
-            print_r($output);
-            exec("ssh $ip \"pgpool -m fast stop ; pgpool -D\"", $output);
-            print_r($output);
+            exec("ssh $ip \"/usr/local/bin/pgpool_restart.sh\"", $output);
         }
         unlink($source);
     }
@@ -195,12 +207,11 @@ Class DbJob{
     }
 
     private function setupReplication($master_ip, $slave_array) {
-        $format = 'bash -x /usr/local/bin/followmaster.sh %s %s %s';
-        foreach($slave_array as $slave_id => $slave_ip) {
-            $command = sprintf($format, $slave_ip, $master_ip, $slave_id);
+        $format = 'bash -x /usr/local/bin/attach_slave.sh %s %s';
+        foreach($slave_array as $slave_ip) {
+            $command = sprintf($format, $master_ip, $slave_ip);
             $output = array();
             exec($command, $output);
-            print_r($output);
         }
     }
 

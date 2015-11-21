@@ -7,5 +7,5 @@ lock_file="$jobs_dir.running";
 touch $lock_file
 
 count=$(ls $jobs_dir | wc -l)
-[[ $count -ne 0 ]] && php /opt/ops/config_manager/config_manager.php
+[[ $count -ne 0 ]] && php /opt/ops/config_manager/config_manager.php >> /var/log/config_manager.log 2>&1
 unlink $lock_file
