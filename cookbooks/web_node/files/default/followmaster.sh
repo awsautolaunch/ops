@@ -20,7 +20,6 @@ cat > /tmp/recovery_$slave_ip <<EOF
 standby_mode = 'on'
 primary_conninfo = 'host=$master_ip port=5432 user=postgres'
 trigger_file = '/tmp/trigger_file'
-restore_command = 'cp /var/lib/pgsql/pg_log_archive/%f %p'
 EOF
 
 cmd_2=$(cat <<EOF
