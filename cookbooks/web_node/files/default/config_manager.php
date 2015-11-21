@@ -5,7 +5,7 @@ $jobs_dir = "/var/www/html/jobs/";
 $lock_file = $jobs_dir . ".running";
 
 # Includes.
-foreach(glob('lib/' . '*.php') as $filename) {
+foreach(glob(__DIR__ . '/lib/' . '*.php') as $filename) {
     require $filename;
 }
 

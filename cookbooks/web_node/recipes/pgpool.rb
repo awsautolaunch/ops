@@ -86,3 +86,17 @@ cookbook_file "/usr/local/bin/followmaster.sh" do
     group "root"
     mode 0755
 end
+
+cookbook_file "/usr/local/bin/attach_slave.sh" do
+    source "attach_slave.sh"
+    owner "root"
+    group "root"
+    mode 0755
+end
+
+cookbook_file "/usr/local/bin/pgpool_restart.sh" do
+    source "pgpool_restart.sh"
+    owner "root"
+    group "root"
+    mode 0755
+end

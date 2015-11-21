@@ -76,22 +76,22 @@ cookbook_file '/etc/php-fpm.d/www.conf' do
 end
 
 # Install SELinux module to allow php-fpm to connect to postgres socket.
-#cookbook_file "/tmp/php_fpm_postgres.pp" do
-#    source "php_fpm_postgres.pp"
-#    mode 0755
-    #notifies :run, 'bash[php_fpm_selinux]', :immediately
-#    action :nothing
-#end
+cookbook_file "/tmp/php_fpm_postgres.pp" do
+    source "php_fpm_postgres.pp"
+    mode 0755
+    notifies :run, 'bash[php_fpm_selinux]', :immediately
+    action :nothing
+end
 
-#bash 'php_fpm_selinux' do
-#    code <<-EOH
-#        semodule -i /tmp/php_fpm_postgres.pp
-#        setsebool -P httpd_can_network_connect on
-#        sysctl -w net.core.somaxconn=1024
-#        ulimit -n 16384
-#    EOH
-#    action :nothing
-#end
+bash 'php_fpm_selinux' do
+    code <<-EOH
+        semodule -i /tmp/php_fpm_postgres.pp
+        setsebool -P httpd_can_network_connect on
+        sysctl -w net.core.somaxconn=1024
+        ulimit -n 16384
+    EOH
+    action :nothing
+end
 
 # Code push
 deploy_revision 'endpoint_repo' do
@@ -144,12 +144,18 @@ end
 
 bash "config_manager_first_time" do
     code <<-EOH
-        mkdir -p /var/www/html/configs /var/www/html/Jobs
-        echo '{"job_name":"db_node"}' > /var/www/html/Jobs/first_db_job
-        echo '{"job_name":"redis_node"}' > /var/www/html/Jobs/first_redis_job
-        chown nginx.nginx -R /var/www/html/configs /var/www/html/Jobs
+        mkdir -p /var/www/html/configs /var/www/html/jobs
+        chown nginx.nginx -R /var/www/html/configs /var/www/html/jobs
     EOH
-    not_if { ::File.exists?('/var/www/html/Jobs') }
+    not_if { ::File.exists?('/var/www/html/jobs') }
+end
+
+cookbook_file "/etc/php.ini" do
+    source "php.ini"
+    owner "root"
+    group "root"
+    mode 0644
+    notifies :restart, 'service[php-fpm]', :immediately
 end
 
 # Set file perms

@@ -26,8 +26,10 @@ Class RedisJob{
         }
 
         $working_nodes = $this->getWorkingNodes('cloudinit');
-        $this->pushConfig($working_nodes);
-        unlink($job_file);
+        if (count($working_nodes) > 0 ) {
+            $this->pushConfig($working_nodes);
+            unlink($job_file);
+        }
     }
 
     private function getWorkingNodes($tag_name, $role_name="redis_node") {
@@ -66,8 +68,9 @@ Class RedisJob{
         $source = tempnam ('/tmp', 'redis.ips');
         $destination = '/var/www/html/configs/redis.ips';     
         file_put_contents($source, json_encode($redis_ips));
+        chmod($source, 0664);
+        chmod($source, 0664);
         foreach($web_ips as $ip) {
-            $ip = '52.32.61.254';
             exec("scp $source $ip:$destination");
         }
         unlink($source);

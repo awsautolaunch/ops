@@ -108,7 +108,7 @@
                 print_r("Waiting 30 secs, for web server to boot...\n");
                 sleep(30);
             }
-            
+            hitSetupAPI();
         }
     }
 
