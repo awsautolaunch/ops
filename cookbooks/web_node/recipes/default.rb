@@ -166,6 +166,8 @@ bash "config_manager_first_time" do
     code <<-EOH
         mkdir -p /var/www/html/configs /var/www/html/jobs
         chown nginx.nginx -R /var/www/html/configs /var/www/html/jobs
+        echo '{"job_name":"db_node"}' > /var/www/html/jobs/first_db_job
+        echo '{"job_name":"redis_nod"}' > /var/www/html/jobs/first_redis_job
     EOH
     not_if { ::File.exists?('/var/www/html/jobs') }
 end
