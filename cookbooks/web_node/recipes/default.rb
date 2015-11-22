@@ -87,6 +87,11 @@ cookbook_file "/tmp/postgres_sock.pp" do
     mode 0755
 end
 
+cookbook_file "/tmp/unix_stream.pp" do
+    source "unix_stream.pp"
+    mode 0755
+end
+
 # Install SELinux module to allow php-fpm to connect to postgres socket.
 cookbook_file "/tmp/php_fpm_postgres.pp" do
     source "php_fpm_postgres.pp"
@@ -100,6 +105,7 @@ bash 'php_fpm_selinux' do
         semodule -i /tmp/php_fpm_postgres.pp
         semodule -i /tmp/php_fpm.pp
         semodule -i /tmp/postgres_sock.pp
+        semodule -i /tmp/unix_stream.pp
         setsebool -P httpd_can_network_connect on
         sysctl -w net.core.somaxconn=1024
         ulimit -n 16384
